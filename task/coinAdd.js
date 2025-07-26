@@ -79,15 +79,15 @@ class coinAdd extends base {
     if (isCoin) {
       console.info('已经为' + videoTitle + '投过币了');
       return false;
-    }
-
-    const result = await this.request.post(coinAddURL, qs.stringify(params));
-    if (+result.code === 0) {
+    }    const result = await this.request.post(coinAddURL, qs.stringify(params));
+    if (result && +result.code === 0) {
       console.info('----- [投币成功] -----');
       return false;
+    } else if (result) {
+      console.info(`----- [投币失败] message: ${result.message || result.msg || '未知错误'} -----`);
+    } else {
+      console.error('----- [投币请求失败] -----');
     }
-
-    console.info(`----- [投币失败] message: ${result} -----`);
     return false;
   }
 

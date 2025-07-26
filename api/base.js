@@ -41,9 +41,21 @@ class Base {
       result = await axios.get(url, {
         headers,
         params,
-      });
-    } catch (e) {
-      await send();
+      });    } catch (e) {
+      console.error('API请求失败:', e.message);
+      // 只有在有serverSecret的情况下才发送通知
+      const user = JSON.parse(
+        fs.readFileSync(path.join(__dirname, './../task/userStatus.json'), {
+          encoding: 'utf-8',
+        })
+      );
+      if (user.serverSecret) {
+        try {
+          await send(user.serverSecret, 'B站任务API请求失败', `请求URL: ${url}\n错误信息: ${e.message}`);
+        } catch (sendError) {
+          console.error('发送通知失败:', sendError.message);
+        }
+      }
     }
 
     return field === '' ? result.data : this._.get(result.data, field);

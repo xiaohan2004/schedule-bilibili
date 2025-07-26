@@ -20,32 +20,44 @@ class Task {
   order() {
     throw new Error('order() Must be implement');
   }
-
   async get(url, params, field) {
     let result = {};
     try {
+      console.log(`[HTTP GET] 请求: ${url}`);
+      if (params && Object.keys(params).length > 0) {
+        console.log('[HTTP GET] 参数:', params);
+      }
       result = await this.request.get(url, params, field);
+      console.log(`[HTTP GET] 响应成功`);
     } catch (e) {
-      console.error('请求失败');
+      console.error(`[HTTP GET] 请求失败: ${e.message}`);
     }
     return result;
   }
-
   async post(url, params, field) {
     let result = {};
     try {
-      result = await this.request.post(url, params, field);
+      console.log(`[HTTP POST] 请求: ${url}`);
+      if (params) {
+        console.log('[HTTP POST] 参数类型:', typeof params);
+      }
+      result = await this.request.post(url, params, field);      console.log(`[HTTP POST] 响应成功`);
     } catch (e) {
-      console.error('请求失败');
+      console.error(`[HTTP POST] 请求失败: ${e.message}`);
     }
+    return result;
   }
 
   async getCookie(field) {
     const userInfo = this.getUserStatus();
     const res = userInfo.cookie.split(';');
     const [tstr] = res.filter((f) => f.indexOf(field) != -1);
+    if (!tstr) {
+      console.error(`Cookie字段 ${field} 未找到`);
+      return null;
+    }
     let [_, jct] = tstr.split('=');
-    return jct;
+    return jct ? jct.trim() : null;
   }
 
   async send(msg) {

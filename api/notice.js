@@ -1,6 +1,12 @@
 const axios = require('axios');
 
 module.exports = async (secret, title, body) => {
+  // 如果没有提供secret，直接返回
+  if (!secret || secret === 'undefined') {
+    console.log('未配置Server酱密钥，跳过消息推送');
+    return;
+  }
+
   let data = `text=${title}&desp=${body}`;
 
   let config = {
@@ -17,9 +23,13 @@ module.exports = async (secret, title, body) => {
       Referer: 'http://sc.ftqq.com/?c=code',
       'Accept-Language': 'zh-CN,zh;q=0.9',
       Cookie: 'PHPSESSID=0c77175e2c4ebd7323b0c3d5f5439e3b',
-    },
-    data: data,
+    },    data: data,
   };
 
-  return await axios(config);
+  try {
+    return await axios(config);
+  } catch (error) {
+    console.error('Server酱推送失败:', error.message);
+    return null;
+  }
 };

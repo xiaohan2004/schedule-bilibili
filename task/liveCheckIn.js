@@ -8,19 +8,36 @@ const fs = require('fs');
 class liveCheckIn extends base {
   order() {
     return 6;
-  }
-
-  async run() {
+  }  async run() {
+    console.log('\n===== 开始执行直播签到任务 =====');
+    
     const liveCheckInURL =
       'https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign';
+    
+    console.log('请求参数:', {
+      url: liveCheckInURL,
+      method: 'GET'
+    });
+    
     let result = await this.request.get(liveCheckInURL);
-    if (+result.code === 0) {
-      console.info(
-        '----- [直播签到成功，本次获得] -----' + result.data.text.specialText
-      );
+    
+    console.log('直播签到API响应:', {
+      hasResult: !!result,
+      code: result ? result.code : 'undefined',
+      message: result ? (result.message || result.msg) : 'undefined',
+      data: result && result.data ? '有数据' : '无数据'
+    });
+    
+    if (result && +result.code === 0) {
+      const rewardText = result.data?.text?.specialText || '签到奖励';
+      console.info('----- [直播签到成功，本次获得] -----' + rewardText);
+    } else if (result) {
+      console.info('----- [直播签到失败] ----- ' + (result.message || result.msg || '未知错误'));
     } else {
-      console.info('----- [直播签到失败] ----- ' + result.message);
+      console.error('----- [直播签到请求失败] -----');
     }
+    
+    console.log('===== 直播签到任务执行完成 =====\n');
   }
 
   getTaskName() {
