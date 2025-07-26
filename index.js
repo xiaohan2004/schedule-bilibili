@@ -20,7 +20,7 @@ const _ = require('lodash');
 
   // run task
   let taskLists = Object.keys(tasks);
-  taskLists = taskLists.filter((f) => !['Base', 'Index'].some((s) => f === s));
+  taskLists = taskLists.filter((f) => !['Base', 'Index', 'CoinAdd'].some((s) => f === s));
 
   const taskList = taskLists
     .reduce((acc, taskName) => {
