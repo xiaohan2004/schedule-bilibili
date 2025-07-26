@@ -19,12 +19,28 @@ const _ = require('lodash');
     return;
   }  // save user data
   console.log('保存用户配置到 userStatus.json...');
-  fs.writeFileSync(
-    path.join(__dirname, './task/userStatus.json'),
-    JSON.stringify({ cookie, serverSecret }),
-    { encoding: 'utf-8' }
-  );
-  console.log('用户配置保存完成');
+  
+  const userStatusPath = path.join(__dirname, './task/userStatus.json');
+  const taskDir = path.join(__dirname, './task');
+  
+  // 确保task目录存在
+  if (!fs.existsSync(taskDir)) {
+    console.log('创建task目录...');
+    fs.mkdirSync(taskDir, { recursive: true });
+  }
+  
+  // 保存用户配置
+  try {
+    fs.writeFileSync(
+      userStatusPath,
+      JSON.stringify({ cookie, serverSecret }),
+      { encoding: 'utf-8' }
+    );
+    console.log('用户配置保存完成');
+  } catch (error) {
+    console.error('保存用户配置失败:', error.message);
+    console.error('程序将继续执行，但可能会出现问题');
+  }
 
   // run task
   console.log('\n开始加载任务列表...');

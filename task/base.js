@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const fs = require('fs');
+const path = require('path');
 const Request = require('./../api/base');
 const notice = require('./../api/notice');
 const request = new Request();
@@ -66,30 +67,78 @@ class Task {
       'Bilibili 通知' + +new Date(),
       msg
     );
-  }
-
-  /**
+  }  /**
    * 读取用户信息
    */
   getUserStatus() {
-    const userStr = fs.readFileSync(__dirname + '/userStatus.json', {
-      encoding: 'utf-8',
-    });
-    const user = JSON.parse(userStr);
-    return user;
-  }
-
-  /**
+    const userStatusPath = __dirname + '/userStatus.json';
+    const fallbackPath = path.join(process.cwd(), 'userStatus.json');
+    
+    try {
+      // 首先尝试从task目录读取
+      if (fs.existsSync(userStatusPath)) {
+        const userStr = fs.readFileSync(userStatusPath, {
+          encoding: 'utf-8',
+        });
+        const user = JSON.parse(userStr);
+        return user;
+      }
+      
+      // 如果task目录中没有，尝试从工作目录读取
+      if (fs.existsSync(fallbackPath)) {
+        console.log('从备用位置读取用户配置:', fallbackPath);
+        const userStr = fs.readFileSync(fallbackPath, {
+          encoding: 'utf-8',
+        });
+        const user = JSON.parse(userStr);
+        return user;
+      }
+      
+      // 两个位置都没有文件
+      console.log('userStatus.json 不存在，返回默认配置');
+      return { cookie: '', serverSecret: '' };
+      
+    } catch (error) {
+      console.error('读取用户状态失败:', error.message);
+      return { cookie: '', serverSecret: '' };
+    }
+  }/**
    * 设置用户信息
    * @param {用户信息}} userInfo
    */
   setUserStatus(userInfo) {
-    const oldUser = this.getUserStatus();
-    userInfo = Object.assign({}, oldUser, userInfo);
+    try {
+      const oldUser = this.getUserStatus();
+      userInfo = Object.assign({}, oldUser, userInfo);
 
-    fs.writeFileSync(__dirname + '/userStatus.json', JSON.stringify(userInfo), {
-      encoding: 'utf-8',
-    });
+      const userStatusPath = __dirname + '/userStatus.json';
+      const taskDir = __dirname;
+      
+      // 确保目录存在
+      if (!fs.existsSync(taskDir)) {
+        console.log('创建task目录...');
+        fs.mkdirSync(taskDir, { recursive: true });
+      }
+      
+      // 写入文件
+      fs.writeFileSync(userStatusPath, JSON.stringify(userInfo, null, 2), {
+        encoding: 'utf-8',
+      });
+      console.log('用户状态保存成功:', userStatusPath);
+    } catch (error) {
+      console.error('保存用户状态失败:', error.message);
+      console.error('尝试使用绝对路径保存...');
+        // 备用方案：使用进程工作目录
+      try {
+        const fallbackPath = path.join(process.cwd(), 'userStatus.json');
+        fs.writeFileSync(fallbackPath, JSON.stringify(userInfo, null, 2), {
+          encoding: 'utf-8',
+        });
+        console.log('用户状态已保存到备用位置:', fallbackPath);
+      } catch (fallbackError) {
+        console.error('备用保存方案也失败:', fallbackError.message);
+      }
+    }
   }
 
   async getVideoTitle(bvid) {
