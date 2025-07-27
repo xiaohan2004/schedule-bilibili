@@ -25,8 +25,9 @@ class userCheck extends base {
     if (isLogin) {
       this.userInfo = result.data;
       console.info('----- login success -----');
-      console.info('----- [username] - ' + username);
-      console.info('----- [金币余额] - ' + money);
+      const intPart = Math.floor(Math.abs(Number(money))); // 处理可能是字符串的小数
+      const lastDigit = intPart % 10;
+      console.info(`----- [金币余额个位：${lastDigit}] -----`);
       this.setUserStatus(result.data);
       return true;
     } else {

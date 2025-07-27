@@ -20,31 +20,22 @@ class Task {
 
   order() {
     throw new Error('order() Must be implement');
-  }
-  async get(url, params, field) {
+  }  async get(url, params, field) {
     let result = {};
     try {
-      console.log(`[HTTP GET] 请求: ${url}`);
-      if (params && Object.keys(params).length > 0) {
-        console.log('[HTTP GET] 参数:', params);
-      }
       result = await this.request.get(url, params, field);
-      console.log(`[HTTP GET] 响应成功`);
+      console.log(`[HTTP GET] 请求成功`);
     } catch (e) {
-      console.error(`[HTTP GET] 请求失败: ${e.message}`);
+      console.error(`[HTTP GET] 请求失败`);
     }
     return result;
-  }
-  async post(url, params, field) {
+  }  async post(url, params, field) {
     let result = {};
     try {
-      console.log(`[HTTP POST] 请求: ${url}`);
-      if (params) {
-        console.log('[HTTP POST] 参数类型:', typeof params);
-      }
-      result = await this.request.post(url, params, field);      console.log(`[HTTP POST] 响应成功`);
+      result = await this.request.post(url, params, field);
+      console.log(`[HTTP POST] 请求成功`);
     } catch (e) {
-      console.error(`[HTTP POST] 请求失败: ${e.message}`);
+      console.error(`[HTTP POST] 请求失败`);
     }
     return result;
   }
@@ -52,9 +43,8 @@ class Task {
   async getCookie(field) {
     const userInfo = this.getUserStatus();
     const res = userInfo.cookie.split(';');
-    const [tstr] = res.filter((f) => f.indexOf(field) != -1);
-    if (!tstr) {
-      console.error(`Cookie字段 ${field} 未找到`);
+    const [tstr] = res.filter((f) => f.indexOf(field) != -1);    if (!tstr) {
+      console.error(`Cookie字段未找到`);
       return null;
     }
     let [_, jct] = tstr.split('=');
@@ -83,10 +73,9 @@ class Task {
         const user = JSON.parse(userStr);
         return user;
       }
-      
-      // 如果task目录中没有，尝试从工作目录读取
+        // 如果task目录中没有，尝试从工作目录读取
       if (fs.existsSync(fallbackPath)) {
-        console.log('从备用位置读取用户配置:', fallbackPath);
+        console.log('从备用位置读取用户配置');
         const userStr = fs.readFileSync(fallbackPath, {
           encoding: 'utf-8',
         });
@@ -119,24 +108,24 @@ class Task {
         console.log('创建task目录...');
         fs.mkdirSync(taskDir, { recursive: true });
       }
-      
-      // 写入文件
+        // 写入文件
       fs.writeFileSync(userStatusPath, JSON.stringify(userInfo, null, 2), {
         encoding: 'utf-8',
       });
-      console.log('用户状态保存成功:', userStatusPath);
+      console.log('用户状态保存成功');
     } catch (error) {
-      console.error('保存用户状态失败:', error.message);
-      console.error('尝试使用绝对路径保存...');
-        // 备用方案：使用进程工作目录
+      console.error('保存用户状态失败');
+      console.error('尝试使用备用路径保存...');
+      
+      // 备用方案：使用进程工作目录
       try {
         const fallbackPath = path.join(process.cwd(), 'userStatus.json');
         fs.writeFileSync(fallbackPath, JSON.stringify(userInfo, null, 2), {
           encoding: 'utf-8',
         });
-        console.log('用户状态已保存到备用位置:', fallbackPath);
+        console.log('用户状态已保存到备用位置');
       } catch (fallbackError) {
-        console.error('备用保存方案也失败:', fallbackError.message);
+        console.error('备用保存方案也失败');
       }
     }
   }

@@ -9,15 +9,12 @@ const _ = require('lodash');
   console.log('     🚀 B站自动任务脚本启动');
   console.log('=====================================');
   console.log('启动时间（北京时间）:', new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
-  console.log('接收到的参数:', {
-    hasCookie: !!cookie,
-    hasServerSecret: !!serverSecret
-  });
+  console.log('参数检查: 通过');
 
   if (!cookie) {
     console.error('----- [参数传递不正确，请检查参数] -----');
     return;
-  }  // save user data
+  }// save user data
   console.log('保存用户配置到 userStatus.json...');
   
   const userStatusPath = path.join(__dirname, './task/userStatus.json');

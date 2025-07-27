@@ -20,10 +20,6 @@ class silverToCoin extends base {
     
     console.log('1. 正在尝试兑换银瓜子...');
     const csrf = await this.getCookie('bili_jct');
-    console.log('请求参数:', {
-      url: this.silverToCoinURL,
-      csrf: csrf ? '已获取' : '获取失败'
-    });
     
     // 银瓜子兑换硬币通常需要POST请求，并且需要csrf参数
     const result = await this.request.post(
@@ -33,24 +29,15 @@ class silverToCoin extends base {
       })
     );
     
-    console.log('银瓜子兑换API响应:', {
-      hasResult: !!result,
-      code: result ? result.code : 'undefined',
-      message: result ? (result.msg || result.message) : 'undefined'
-    });
-    
     if (result && result.code === 0) {
       console.info('----- [银瓜子兑换硬币成功] -----');
     } else if (result) {
-      console.info(`----- [银瓜子兑换硬币失败 原因是: ${result.msg || result.message || '未知错误'}] -----`);
+      console.info(`----- [银瓜子兑换硬币失败] -----`);
     } else {
-      console.error('----- [银瓜子兑换硬币请求失败，无法连接到API] -----');
+      console.error('----- [银瓜子兑换硬币请求失败] -----');
     }
 
     console.log('2. 查询银瓜子余额...');
-    console.log('请求参数:', {
-      url: this.silverToCoinStatusURL
-    });
     
     const queryCoinStatus = await this.request.get(
       this.silverToCoinStatusURL,
@@ -58,13 +45,11 @@ class silverToCoin extends base {
       'data'
     );
     
-    console.log('银瓜子余额查询API响应:', {
-      hasResult: !!queryCoinStatus,
-      silver: queryCoinStatus ? queryCoinStatus.silver : 'undefined'
-    });
-    
-    if (queryCoinStatus) {
-      console.info(`----- [当前银瓜子余额：${queryCoinStatus.silver || '获取失败'}] -----`);
+    if (queryCoinStatus && queryCoinStatus.silver !== undefined) {
+      const silver = Number(queryCoinStatus.silver);
+      const silverIntPart = Math.floor(Math.abs(silver));
+      const silverLastDigit = silverIntPart % 10;
+      console.info(`----- [当前银瓜子余额个位：${silverLastDigit}] -----`);
     } else {
       console.error('----- [无法获取银瓜子余额] -----');
     }

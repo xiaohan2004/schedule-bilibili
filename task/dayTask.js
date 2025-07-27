@@ -17,38 +17,19 @@ class dayTask extends base {
     
     const dayTaskURL = 'https://api.bilibili.com/x/member/web/exp/reward';
     
-    console.log('请求参数:', {
-      url: dayTaskURL,
-      method: 'GET'
-    });
-    
     let result = await this.get(dayTaskURL);
-    console.log('每日任务状态API第一次响应:', {
-      hasResult: !!result,
-      code: result ? result.code : 'undefined',
-      message: result ? (result.message || result.msg) : 'undefined',
-      data: result && result.data ? '有数据' : '无数据'
-    });
     
     if (result && +result.code === 0) {
       console.info('----- 请求本日任务状态成功 -----');
-      console.log('任务状态数据:', result.data || {});
       this.setUserStatus(result.data || {});
     } else if (result) {
       // 偶发性失败，在请求一次
-      console.error(`----- [error] ${result.message || result.msg || '未知错误'} -----`);
-      console.log('正在重试获取任务状态...');
+      console.error(`----- [error] 第一次请求失败，正在重试 -----`);
       
       result = await this.get(dayTaskURL);
-      console.log('每日任务状态API重试响应:', {
-        hasResult: !!result,
-        code: result ? result.code : 'undefined',
-        message: result ? (result.message || result.msg) : 'undefined',
-        data: result && result.data ? '有数据' : '无数据'
-      });
       
       if (result && result.data) {
-        console.log('重试成功，任务状态数据:', result.data);
+        console.log('重试成功');
         this.setUserStatus(result.data);
       } else {
         console.error('----- [error] 重试后仍然失败，使用默认状态 -----');

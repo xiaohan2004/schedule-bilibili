@@ -14,25 +14,13 @@ class liveCheckIn extends base {
     const liveCheckInURL =
       'https://api.live.bilibili.com/xlive/web-ucenter/v1/sign/DoSign';
     
-    console.log('请求参数:', {
-      url: liveCheckInURL,
-      method: 'GET'
-    });
-    
     let result = await this.request.get(liveCheckInURL);
-    
-    console.log('直播签到API响应:', {
-      hasResult: !!result,
-      code: result ? result.code : 'undefined',
-      message: result ? (result.message || result.msg) : 'undefined',
-      data: result && result.data ? '有数据' : '无数据'
-    });
     
     if (result && +result.code === 0) {
       const rewardText = result.data?.text?.specialText || '签到奖励';
       console.info('----- [直播签到成功，本次获得] -----' + rewardText);
     } else if (result) {
-      console.info('----- [直播签到失败] ----- ' + (result.message || result.msg || '未知错误'));
+      console.info('----- [直播签到失败] -----');
     } else {
       console.error('----- [直播签到请求失败] -----');
     }
