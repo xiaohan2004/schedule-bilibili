@@ -81,5 +81,5 @@ const _ = require('lodash');
   }
   
   console.log('\n🎉 所有任务执行完成！');
-  console.log('结束时间:', new Date().toLocaleString());
+  console.log('结束时间（北京时间）:', new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
 })();
