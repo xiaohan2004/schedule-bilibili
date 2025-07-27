@@ -8,7 +8,7 @@ const _ = require('lodash');
   console.log('=====================================');
   console.log('     🚀 B站自动任务脚本启动');
   console.log('=====================================');
-  console.log('启动时间:', new Date().toLocaleString());
+  console.log('启动时间（北京时间）:', new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' }));
   console.log('接收到的参数:', {
     hasCookie: !!cookie,
     hasServerSecret: !!serverSecret
